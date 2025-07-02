@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Swifture</title>
 
-  <!-- FlipClock CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.css">
-
-  <!-- Custom Styles -->
   <style>
     body {
       margin: 0;
@@ -51,39 +47,33 @@
       justify-content: center;
     }
 
-    .info-card i {
-      margin-right: 8px;
+    .clock-container {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      font-size: 32px;
+      font-family: monospace;
+      letter-spacing: 2px;
+      user-select: none;
     }
 
-    .flip-clock-container {
-      background-color: #1a1a1a;
-      border: 2px solid orange;
-      border-radius: 10px;
-      padding: 12px;
-      box-shadow: 0 0 20px orange;
-    }
-
-    .flipdown {
-      margin: auto;
-      transform: scale(0.7);
-    }
-
-    .flipdown .rotor-group {
-      margin: 0 3px;
-    }
-
-    .flipdown .rotor, 
-    .flipdown .rotor-top, 
-    .flipdown .rotor-bottom {
-      background-color: #ffe9cc;
-      border-radius: 5px;
+    .digit {
+      background: #ffe9cc;
+      border-radius: 6px;
       color: #000;
-      font-family: 'Courier New', Courier, monospace;
+      width: 40px;
+      height: 60px;
+      line-height: 60px;
+      text-align: center;
+      box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Optional: hide days counter */
-    .flipdown .rotor-group:nth-child(1) {
-      display: none;
+    .colon {
+      font-size: 40px;
+      color: #ffa500;
+      padding: 0 4px;
     }
 
     .products {
@@ -124,26 +114,39 @@
       display: inline-block;
       margin-top: 12px;
     }
+
+    .flip {
+      animation: flip 0.6s ease forwards;
+    }
+
+    @keyframes flip {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(-360deg); }
+    }
   </style>
 </head>
 <body>
-  <!-- Header Image -->
   <div class="header">
     <img src="your-header-image.jpg" alt="Swifture header" />
-    <!-- Info Panel -->
     <div class="info-panel">
       <div class="info-card" id="calendar"></div>
-      <div class="flip-clock-container">
-        <div id="flip-clock" class="flipdown"></div>
-      </div>
-      <div class="info-card" id="weather"></div>
       <div class="info-card">
-        📧 <span style="margin-left: 8px;">support@swifture.co</span>
+        <div class="clock-container" id="clock">
+          <div class="digit">0</div>
+          <div class="digit">0</div>
+          <div class="colon">:</div>
+          <div class="digit">0</div>
+          <div class="digit">0</div>
+          <div class="colon">:</div>
+          <div class="digit">0</div>
+          <div class="digit">0</div>
+        </div>
       </div>
+      <div class="info-card" id="weather">Houston: +30°C 🌤️</div>
+      <div class="info-card">📧 support@swifture.co</div>
     </div>
   </div>
 
-  <!-- Product Section -->
   <div class="products">
     <div class="product-card">
       <img src="product1.jpg" alt="Product 1" style="width:100%; border-radius: 6px;" />
@@ -157,32 +160,31 @@
       <p>Short product description goes here.</p>
       <a href="#" class="amazon-btn">Shop at Amazon</a>
     </div>
-    <!-- Add more products here -->
   </div>
 
-  <!-- FlipClock + Dynamic Content JS -->
-  <script src="https://cdn.jsdelivr.net/npm/flipdown@0.3.2/dist/flipdown.min.js"></script>
   <script>
-    // Start flip clock counting down to next midnight (used for 24h flip style)
-    function startFlipClock() {
+    function updateClock() {
       const now = new Date();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0);
-      const secondsToMidnight = Math.floor((midnight - now) / 1000);
+      const timeStr = now.toTimeString().slice(0, 8); // HH:MM:SS
+      const digits = document.querySelectorAll('.digit');
+      const chars = timeStr.replace(/:/g, '');
 
-      new FlipDown((Date.now() / 1000) + secondsToMidnight, {
-        theme: 'light'
-      }).start();
+      chars.split('').forEach((char, idx) => {
+        if (digits[idx].textContent !== char) {
+          digits[idx].textContent = char;
+          digits[idx].classList.remove('flip');
+          void digits[idx].offsetWidth; // trigger reflow
+          digits[idx].classList.add('flip');
+        }
+      });
     }
 
-    startFlipClock();
+    setInterval(updateClock, 1000);
+    updateClock(); // run once on load
 
-    // Set calendar date
+    // Set today's date
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById("calendar").textContent = new Date().toLocaleDateString(undefined, options);
-
-    // Example weather (can be made dynamic with API)
-    document.getElementById("weather").textContent = "Houston: +30°C 🌤️";
   </script>
 </body>
 </html>
