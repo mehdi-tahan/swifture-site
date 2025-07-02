@@ -4,187 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Swifture</title>
-
-  <style>
-    body {
-      margin: 0;
-      background-color: #111;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-    }
-
-    .header {
-      position: relative;
-      text-align: center;
-    }
-
-    .header img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-    }
-
-    .info-panel {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 10;
-    }
-
-    .info-card {
-      background-color: #1a1a1a;
-      border: 2px solid orange;
-      border-radius: 10px;
-      padding: 12px 16px;
-      min-width: 260px;
-      box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .clock-container {
-      display: flex;
-      gap: 5px;
-      justify-content: center;
-      font-size: 32px;
-      font-family: monospace;
-      letter-spacing: 2px;
-      user-select: none;
-    }
-
-    .digit {
-      background: #ffe9cc;
-      border-radius: 6px;
-      color: #000;
-      width: 40px;
-      height: 60px;
-      line-height: 60px;
-      text-align: center;
-      box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .colon {
-      font-size: 40px;
-      color: #ffa500;
-      padding: 0 4px;
-    }
-
-    .products {
-      margin-top: 260px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      padding: 40px;
-      justify-content: center;
-    }
-
-    .product-card {
-      background-color: #1f1f1f;
-      border-radius: 10px;
-      padding: 20px;
-      width: 240px;
-      text-align: center;
-      box-shadow: 0 0 10px #000;
-    }
-
-    .product-card h3 {
-      margin-top: 10px;
-      font-size: 18px;
-    }
-
-    .product-card p {
-      font-size: 14px;
-      color: #ccc;
-    }
-
-    .amazon-btn {
-      background-color: orange;
-      color: #000;
-      padding: 10px 16px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      display: inline-block;
-      margin-top: 12px;
-    }
-
-    .flip {
-      animation: flip 0.6s ease forwards;
-    }
-
-    @keyframes flip {
-      0% { transform: rotateX(0deg); }
-      100% { transform: rotateX(-360deg); }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="header">
-    <img src="your-header-image.jpg" alt="Swifture header" />
-    <div class="info-panel">
-      <div class="info-card" id="calendar"></div>
-      <div class="info-card">
-        <div class="clock-container" id="clock">
-          <div class="digit">0</div>
-          <div class="digit">0</div>
-          <div class="colon">:</div>
-          <div class="digit">0</div>
-          <div class="digit">0</div>
-          <div class="colon">:</div>
-          <div class="digit">0</div>
-          <div class="digit">0</div>
-        </div>
-      </div>
-      <div class="info-card" id="weather">Houston: +30°C 🌤️</div>
-      <div class="info-card">📧 support@swifture.co</div>
+  <header>
+    <img src="assets/header.png" alt="Swifture header" class="header-img" />
+  </header>
+
+  <div class="info-container">
+    <div class="info-box calendar" id="calendarBox">📅 Wednesday, July 2, 2025</div>
+
+    <div class="info-box clock" id="flipClock">
+      <div class="flip-card" id="hours">00</div>
+      <div class="colon">:</div>
+      <div class="flip-card" id="minutes">00</div>
     </div>
+
+    <div class="info-box weather">⛅ Houston: +30°C</div>
+    <div class="info-box email">📧 support@swifture.co</div>
   </div>
 
-  <div class="products">
-    <div class="product-card">
-      <img src="product1.jpg" alt="Product 1" style="width:100%; border-radius: 6px;" />
-      <h3>Product Title 1</h3>
-      <p>Short product description goes here.</p>
-      <a href="#" class="amazon-btn">Shop at Amazon</a>
-    </div>
-    <div class="product-card">
-      <img src="product2.jpg" alt="Product 2" style="width:100%; border-radius: 6px;" />
-      <h3>Product Title 2</h3>
-      <p>Short product description goes here.</p>
-      <a href="#" class="amazon-btn">Shop at Amazon</a>
-    </div>
-  </div>
-
-  <script>
-    function updateClock() {
-      const now = new Date();
-      const timeStr = now.toTimeString().slice(0, 8); // HH:MM:SS
-      const digits = document.querySelectorAll('.digit');
-      const chars = timeStr.replace(/:/g, '');
-
-      chars.split('').forEach((char, idx) => {
-        if (digits[idx].textContent !== char) {
-          digits[idx].textContent = char;
-          digits[idx].classList.remove('flip');
-          void digits[idx].offsetWidth; // trigger reflow
-          digits[idx].classList.add('flip');
-        }
-      });
-    }
-
-    setInterval(updateClock, 1000);
-    updateClock(); // run once on load
-
-    // Set today's date
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById("calendar").textContent = new Date().toLocaleDateString(undefined, options);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
