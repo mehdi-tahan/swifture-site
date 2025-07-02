@@ -18,29 +18,33 @@
       color: #fff;
     }
 
-    .info-box {
+    .info-container {
       position: fixed;
       top: 20px;
       right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+    }
+
+    .info-card {
       background: rgba(255, 140, 0, 0.15);
       border: 2px solid #f7931e;
       border-radius: 12px;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
+      padding: 15px 20px;
       font-size: 0.95em;
       font-weight: 500;
-      z-index: 100;
-      box-shadow: 0 0 15px rgba(247, 147, 30, 0.25);
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(247, 147, 30, 0.35);
+      min-width: 160px;
+      min-height: 55px;
     }
 
-    .info-box a {
+    .info-card a {
       color: #f7931e;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-weight: 600;
     }
 
     .header {
@@ -100,17 +104,53 @@
     .product-card a:hover {
       background-color: #d97900;
     }
+
+    /* Flip Clock */
+    #clock {
+      font-family: monospace;
+      font-size: 1.3em;
+      display: inline-block;
+      perspective: 1000px;
+    }
+
+    .digit {
+      display: inline-block;
+      background-color: #222;
+      padding: 5px 10px;
+      border-radius: 6px;
+      margin: 0 1px;
+      color: #f7931e;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(247, 147, 30, 0.3);
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .digit.animate {
+      transform: rotateX(180deg);
+    }
+
+    /* Calendar */
+    #calendar {
+      font-weight: 600;
+      color: #f0f0f0;
+    }
+
   </style>
 </head>
 <body>
-  <div class="info-box">
-    <div id="clock">Loading time...</div>
-    <div id="weather">Loading weather...</div>
-    <a href="mailto:support@swifture.co">📩 support@swifture.co</a>
+
+  <!-- Info Cards Stacked Top Right -->
+  <div class="info-container">
+    <div class="info-card"><div id="clock"></div></div>
+    <div class="info-card"><div id="weather">Loading weather...</div></div>
+    <div class="info-card"><div id="calendar">Loading date...</div></div>
+    <div class="info-card"><a href="mailto:support@swifture.co">📩 support@swifture.co</a></div>
   </div>
 
+  <!-- Header Image -->
   <div class="header"></div>
 
+  <!-- Product Grid -->
   <div class="main">
     <div class="product-card">
       <img src="images/product1.png" alt="Product 1" />
@@ -127,30 +167,52 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script>
-    // Clock
+    // Flip-style Clock
+    let lastTime = "";
+
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString();
-      document.getElementById('clock').textContent = time;
+      if (time !== lastTime) {
+        const clock = document.getElementById("clock");
+        clock.innerHTML = "";
+        [...time].forEach((char) => {
+          const span = document.createElement("span");
+          span.className = "digit animate";
+          span.textContent = char;
+          clock.appendChild(span);
+        });
+        lastTime = time;
+      }
     }
+
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Weather
+    // Weather by IP
     async function fetchWeather() {
       try {
-        const response = await fetch('https://ipapi.co/json');
-        const data = await response.json();
-        const city = data.city;
-        const weatherRes = await fetch(`https://wttr.in/${city}?format=%t+%c`);
-        const weather = await weatherRes.text();
+        const ipInfo = await fetch('https://ipapi.co/json').then(r => r.json());
+        const city = ipInfo.city;
+        const weather = await fetch(`https://wttr.in/${city}?format=%t+%c`).then(r => r.text());
         document.getElementById('weather').textContent = `${city}: ${weather}`;
-      } catch (error) {
-        document.getElementById('weather').textContent = 'Weather not found';
+      } catch {
+        document.getElementById('weather').textContent = '⚠️ Weather unavailable';
       }
     }
+
     fetchWeather();
+
+    // Calendar Date
+    function updateCalendar() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('calendar').textContent = now.toLocaleDateString(undefined, options);
+    }
+
+    updateCalendar();
   </script>
 </body>
 </html>
