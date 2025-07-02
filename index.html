@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Swifture | Quality You Can Click</title>
   <link rel="icon" href="images/favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -24,27 +24,31 @@
       right: 20px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 12px;
       z-index: 1000;
     }
 
     .info-card {
-      background: rgba(255, 140, 0, 0.15);
+      background: rgba(255, 140, 0, 0.1);
       border: 2px solid #f7931e;
-      border-radius: 12px;
-      padding: 15px 20px;
-      font-size: 0.95em;
-      font-weight: 500;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 1em;
+      font-weight: 600;
       text-align: center;
       box-shadow: 0 6px 20px rgba(247, 147, 30, 0.35);
-      min-width: 160px;
-      min-height: 55px;
+      min-width: 170px;
+      max-width: 190px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .info-card a {
       color: #f7931e;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .header {
@@ -105,34 +109,19 @@
       background-color: #d97900;
     }
 
-    /* Flip Clock */
     #clock {
-      font-family: monospace;
       font-size: 1.3em;
-      display: inline-block;
-      perspective: 1000px;
-    }
-
-    .digit {
-      display: inline-block;
-      background-color: #222;
-      padding: 5px 10px;
-      border-radius: 6px;
-      margin: 0 1px;
-      color: #f7931e;
+      letter-spacing: 1px;
       font-weight: bold;
-      box-shadow: 0 4px 8px rgba(247, 147, 30, 0.3);
-      transition: transform 0.6s ease-in-out;
+      color: #f7931e;
     }
 
-    .digit.animate {
-      transform: rotateX(180deg);
-    }
-
-    /* Calendar */
     #calendar {
-      font-weight: 600;
-      color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    #weather {
+      color: #eee;
     }
 
   </style>
@@ -141,9 +130,9 @@
 
   <!-- Info Cards Stacked Top Right -->
   <div class="info-container">
-    <div class="info-card"><div id="clock"></div></div>
-    <div class="info-card"><div id="weather">Loading weather...</div></div>
-    <div class="info-card"><div id="calendar">Loading date...</div></div>
+    <div class="info-card" id="calendar">📅 Loading date...</div>
+    <div class="info-card" id="clock">⏰ Loading time...</div>
+    <div class="info-card" id="weather">🌤️ Loading weather...</div>
     <div class="info-card"><a href="mailto:support@swifture.co">📩 support@swifture.co</a></div>
   </div>
 
@@ -169,50 +158,33 @@
 
   <!-- Scripts -->
   <script>
-    // Flip-style Clock
-    let lastTime = "";
+    function updateCalendar() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('calendar').textContent = `📅 ${now.toLocaleDateString(undefined, options)}`;
+    }
 
     function updateClock() {
       const now = new Date();
       const time = now.toLocaleTimeString();
-      if (time !== lastTime) {
-        const clock = document.getElementById("clock");
-        clock.innerHTML = "";
-        [...time].forEach((char) => {
-          const span = document.createElement("span");
-          span.className = "digit animate";
-          span.textContent = char;
-          clock.appendChild(span);
-        });
-        lastTime = time;
-      }
+      document.getElementById('clock').textContent = `⏰ ${time}`;
     }
 
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Weather by IP
     async function fetchWeather() {
       try {
         const ipInfo = await fetch('https://ipapi.co/json').then(r => r.json());
         const city = ipInfo.city;
         const weather = await fetch(`https://wttr.in/${city}?format=%t+%c`).then(r => r.text());
-        document.getElementById('weather').textContent = `${city}: ${weather}`;
+        document.getElementById('weather').textContent = `🌤️ ${city}: ${weather}`;
       } catch {
         document.getElementById('weather').textContent = '⚠️ Weather unavailable';
       }
     }
 
-    fetchWeather();
-
-    // Calendar Date
-    function updateCalendar() {
-      const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('calendar').textContent = now.toLocaleDateString(undefined, options);
-    }
-
     updateCalendar();
+    updateClock();
+    setInterval(updateClock, 1000);
+    fetchWeather();
   </script>
 </body>
 </html>
